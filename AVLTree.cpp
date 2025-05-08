@@ -13,28 +13,45 @@ class Node {
     }
 };
 
-int getBalance(Node *root) {
-    return getHeight(root->left) - getHeight(root->right); 
-}
-
 int getHeight(Node *root) {
     if (!root) return 0;
     return root-> height;
 }
 
-Node* rightRotation(Node *root) {
+int getBalance(Node *root) {
+    return getHeight(root->left) - getHeight(root->right); 
+}
 
+Node* rightRotation(Node *root) {
+    Node *child = root->left;
+    Node *childRight = child->right;
+
+    child->right = root;
+    root->left = childRight;
+
+    root->height = 1 + max(getHeight(root->left), getHeight(root->right));
+    child->height = 1 + max(getHeight(child->left), getHeight(child->right));
+
+    return child;
 }
 
 Node* leftRotation(Node *root) {
-    
+    Node *child = root->right;
+    Node *childLeft = child->left;
+
+    child->left = root;
+    root->right = childLeft;
+
+    root->height = 1 + max(getHeight(root->left), getHeight(root->right));
+    child->height = 1 + max(getHeight(child->left), getHeight(child->right));
+
+    return child;
 }
 
 
 Node* insert(Node *root, int key) {
     if (!root) return new Node(key);
 
-    // Find a place where need to add a new element (recursive)
     if (key<root->data) root->left = insert(root->left, key);
     else if (key > root->data) root->right = insert(root->right, key);
     else {return root;}
@@ -43,29 +60,41 @@ Node* insert(Node *root, int key) {
 
     int balance = getBalance(root);  
 
-    // Left Left rotation
     if (balance > 1 && key < root->left->data){
-        rightRotation(root);
+        return rightRotation(root);
     }
-    // right right rotation
     else if (balance < -1 && root->right->data < key) {
-        leftRotation(root);
+        return leftRotation(root);
     }
-    // left right rotation
     else if (balance > 1 && key > root->left->data) {
-        leftRotation(root->left);
-        rightRotation(root);
+        root->left = leftRotation(root->left);
+        return rightRotation(root);
     }
-    // right left rotation
     else if (balance < -1 && root->right->data > key) {
-        rightRotation(root->right);
-        leftRotation(root);
+        root->right = rightRotation(root->right);
+        return leftRotation(root);
     }
     else {
         return root;
     }
 }
 
+void preOrder(Node *root) {
+    if (!root) return;
+
+    cout<<root->data<<" ";
+    preOrder(root->left);
+    preOrder(root->right);  
+}
+
+
+void inOrder(Node *root) {
+    if (!root) return;
+
+    inOrder(root->left);
+    cout<<root->data<<" ";
+    inOrder(root->right);  
+}
 
 int main() {
     Node *root = NULL;
@@ -78,4 +107,8 @@ int main() {
     root = insert(root, 20);
     root = insert(root, 30);
 
+    cout<<"preorder: " <<endl;
+    preOrder(root);
+    cout<<"\ninOrder: " <<endl;
+    inOrder(root);
 }
