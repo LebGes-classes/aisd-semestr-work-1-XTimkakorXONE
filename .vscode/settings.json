@@ -59,6 +59,11 @@
   "files.associations": {
     "*.dbclient-js": "javascript",
     "**/.fttemplates/**": "plaintext",
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "ostream": "cpp",
+    "deque": "cpp",
+    "string": "cpp",
+    "unordered_map": "cpp",
+    "vector": "cpp"
   }
 }

@@ -1,3 +1,4 @@
+#include "AVLTree.hpp"
 #include<iostream>
 using namespace std;
 
@@ -48,6 +49,16 @@ Node* leftRotation(Node *root) {
     return child;
 }
 
+bool search(Node *root, int key) {
+    if (!root) return false;
+    if (key < root->data) {
+        return search(root->left, key);
+    }
+    else if (key > root->data) {
+        return search(root->right, key);
+    }
+    return true;
+}
 
 Node* insert(Node *root, int key) {
     if (!root) return new Node(key);
@@ -79,6 +90,60 @@ Node* insert(Node *root, int key) {
     }
 }
 
+
+Node* deleteNode(Node *root, int key) {
+    if (!root) return NULL;
+
+    if (key < root->data) root->left = deleteNode(root->left, key);
+    else if (key > root->data) root->right = deleteNode(root->right, key);
+    else {
+        if (!root->left && !root->right) {
+            delete root;
+            return NULL;
+        }
+        else if (root->left && !root->right) {
+            Node *temp = root->left;
+            delete root;
+            return temp;
+        }
+        else if (!root->left && root->right) {
+            Node *temp = root->right;
+            delete root;
+            return temp;
+        }
+        else {
+            Node *current = root->right;
+            while (current->left) {
+                current=current->left;
+            }
+            root->data = current->data;
+            root->right = deleteNode(root->right, current->data);
+        }
+    }
+
+    root->height = 1 + max(getHeight(root->left), getHeight(root->right));  
+    int balance = getBalance(root);
+    if (balance > 1) {
+        if (getBalance(root->left) >= 0) {
+            return rightRotation(root);
+        } else {
+            root->left = leftRotation(root->left);
+            return rightRotation(root);
+        }
+    } 
+    else if (balance < -1) {
+        if (getBalance(root->right) <= 0) {
+            return leftRotation(root);
+        } else {
+            root->right = rightRotation(root->left);
+            return leftRotation(root);
+        }
+    }
+    else {return root;}
+}
+
+
+
 void preOrder(Node *root) {
     if (!root) return;
 
@@ -96,8 +161,16 @@ void inOrder(Node *root) {
     inOrder(root->right);  
 }
 
+void postOrder(Node *root) {
+    if (!root) return;
+
+    postOrder(root->left);
+    postOrder(root->right);
+    cout <<root->data<< " ";
+}
+
 int main() {
-    Node *root = NULL;
+    Node *root = NULL;  
 
     root = insert(root, 10);
     root = insert(root, 140);
@@ -106,8 +179,12 @@ int main() {
     root = insert(root, 50);
     root = insert(root, 20);
     root = insert(root, 30);
-
     cout<<"preorder: " <<endl;
+    preOrder(root);
+    cout<<"\ninOrder: " <<endl;
+    inOrder(root);
+    root = deleteNode(root, 30);
+    cout<<"\npreorder: " <<endl;
     preOrder(root);
     cout<<"\ninOrder: " <<endl;
     inOrder(root);
