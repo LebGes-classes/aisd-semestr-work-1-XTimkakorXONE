@@ -2,18 +2,6 @@
 #include<iostream>
 using namespace std;
 
-class Node {
-    public:
-    int data, height;
-    Node *left, *right;
-
-    Node(int value) {
-        data = value;
-        left = right = NULL;
-        height = 1; 
-    }
-};
-
 int getHeight(Node *root) {
     if (!root) return 0;
     return root-> height;
@@ -135,13 +123,20 @@ Node* deleteNode(Node *root, int key) {
         if (getBalance(root->right) <= 0) {
             return leftRotation(root);
         } else {
-            root->right = rightRotation(root->left);
+            root->right = rightRotation(root->right);
             return leftRotation(root);
         }
     }
     else {return root;}
 }
 
+Node* update(Node *root, int oldValue, int newValue) {
+    if (search(root, oldValue)) {
+        root = deleteNode(root, oldValue);
+        root =insert(root, newValue);
+    }
+    return root;
+}
 
 
 void preOrder(Node *root) {
@@ -184,6 +179,7 @@ int main() {
     cout<<"\ninOrder: " <<endl;
     inOrder(root);
     root = deleteNode(root, 30);
+    root = update(root, 50, 42);
     cout<<"\npreorder: " <<endl;
     preOrder(root);
     cout<<"\ninOrder: " <<endl;
